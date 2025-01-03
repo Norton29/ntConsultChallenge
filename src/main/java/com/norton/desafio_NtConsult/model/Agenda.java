@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,14 +16,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "agenda")
 public class Agenda {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    @NotNull
     private String description;
     private Integer yes;
     private Integer no;
+    @NotNull
+    private boolean voted;
     
     
 }
