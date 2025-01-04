@@ -25,13 +25,11 @@ public class PollRepositoryAdapter implements IPollRepositoryPort {
 
   @Override
   public Poll showResults(Long pollId) {
-    Optional<PollModel> pollOptional = pollRepository.findById(pollId);
-    if (pollOptional != null) {
-      PollModel poll = pollOptional.get();
-      return mappers.pollModelToPoll(poll);
-    } else {
+    PollModel pollModel = pollRepository.findById(pollId).orElse(null);
+    if (pollModel == null) {
       throw new NoSuchElementException("Sessão de votação não encontrada.");
     }
+    return mappers.pollModelToPoll(pollModel);
 
   }
 

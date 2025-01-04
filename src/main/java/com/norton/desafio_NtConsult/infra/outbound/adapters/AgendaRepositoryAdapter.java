@@ -18,52 +18,53 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AgendaRepositoryAdapter implements IAgendaRepositoryPort {
 
-    private AgendaRepository agendaRepository;
+  private AgendaRepository agendaRepository;
 
-    private Mappers mappers;
+  private Mappers mappers;
 
-    @Override
-    public Agenda save(Agenda agenda) {
-        AgendaModel agendaModel = mappers.agendaToAgendaModel(agenda);
-        agendaRepository.save(agendaModel);
-        return mappers.agendaModelToAgenda(agendaModel);
+  @Override
+  public Agenda save(Agenda agenda) {
+    AgendaModel agendaModel = mappers.agendaToAgendaModel(agenda);
+    agendaRepository.save(agendaModel);
+    return mappers.agendaModelToAgenda(agendaModel);
 
+  }
+
+  @Override
+  public List<Agenda> find() {
+    return agendaRepository.findAll().stream().map(agenda -> mappers.agendaModelToAgenda(agenda))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public Agenda findById(Long id) {
+    AgendaModel agendaModel = agendaRepository.findById(id).orElse(null);
+    if (agendaModel == null) {
+      throw new NoSuchElementException("Pauta não encontrada.");
     }
+    return mappers.agendaModelToAgenda(agendaModel);
+  }
 
-    @Override
-    public List<Agenda> find() {
-        return agendaRepository.findAll().stream().map(agenda -> mappers.agendaModelToAgenda(agenda))
-                .collect(Collectors.toList());
+  @Override
+  public void registerAgenda(String description) throws Exception {
+    try {
+      agendaRepository.save(AgendaModel.builder()
+        .description(description)
+        .voted(false)
+        .build());
+    } catch (Exception e) {
+      throw new Exception("Erro ao registrar pauta.");
     }
+    
+  }
 
-    @Override
-    public Agenda findById(Long id) {
-        try {
-            AgendaModel agendaModel = agendaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pauta não encontrada."));
-        return mappers.agendaModelToAgenda(agendaModel);
-        } catch (Exception e) {
-            System.out.println("Mensagem da exceção: " + e.getMessage());
-        throw e;
-        }
-        
+  @Override
+  public Agenda showResults(Long agendaId) {
+    AgendaModel agendaModel = agendaRepository.findById(agendaId).orElse(null);
+    if (agendaModel == null) {
+      throw new NoSuchElementException("Pauta não encontrada.");
     }
-
-    @Override
-    public void registerAgenda(String description) {
-        agendaRepository.save(AgendaModel.builder()
-                .description(description)
-                .voted(false)
-                .build());
-    }
-
-    @Override
-    public Agenda showResults(Long agendaId) {
-        AgendaModel agendaModel = agendaRepository.findById(agendaId).get();
-        if (!agendaModel.isVoted()) {
-            throw new IllegalStateException("Pauta ainda não votada.");
-        }
-        return mappers.agendaModelToAgenda(agendaModel);
-    }
+    return mappers.agendaModelToAgenda(agendaModel);
+  }
 
 }

@@ -31,30 +31,20 @@ public class AssociatedrepositoryAdapter implements IAssociatedRepositoryPort {
 
   @Override
   public Associated findById(Long id) {
-    try {
-      Optional<AssociatedModel> associatedOptional = associatedRepository.findById(id);
-      if (associatedOptional != null) {
-        AssociatedModel associated = associatedOptional.get();
-        return mappers.associatedModelToAssociated(associated);
-      }
-    } catch (NoSuchElementException e) {
-      throw new NoSuchElementException("Associado não encontrado: ");
+    AssociatedModel associatedModel = associatedRepository.findById(id).orElse(null);
+    if (associatedModel == null) {
+      throw new NoSuchElementException("Associado não encontrado.");
     }
-    return null;
+    return mappers.associatedModelToAssociated(associatedModel);
   }
 
   @Override
   public Associated findByCpf(String cpf) {
-    try {
-      Optional<AssociatedModel> associatedOptional = associatedRepository.findByCpf(cpf);
-      if (associatedOptional != null) {
-        AssociatedModel associated = associatedOptional.get();
-        return mappers.associatedModelToAssociated(associated);
-      }
-    } catch (NoSuchElementException e) {
-      throw new NoSuchElementException("Associado não encontrado: ");
+    AssociatedModel associatedModel = associatedRepository.findByCpf(cpf).orElse(null);
+    if (associatedModel == null) {
+      throw new NoSuchElementException("Associado não encontrado.");
     }
-    return null;
+    return mappers.associatedModelToAssociated(associatedModel);
   }
 
   @Override
@@ -65,7 +55,7 @@ public class AssociatedrepositoryAdapter implements IAssociatedRepositoryPort {
   @Override
   public List<Associated> find() {
     return associatedRepository.findAll().stream()
-    .map(associated -> mappers.associatedModelToAssociated(associated))
+        .map(associated -> mappers.associatedModelToAssociated(associated))
         .collect(Collectors.toList());
   }
 

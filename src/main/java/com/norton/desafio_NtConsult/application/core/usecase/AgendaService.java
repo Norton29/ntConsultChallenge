@@ -30,12 +30,16 @@ public class AgendaService implements IAgendaServicePort {
   }
 
   @Override
-  public void registerAgenda(String description) {
+  public void registerAgenda(String description) throws Exception {
     agendaRepository.registerAgenda(description);
   }
 
   @Override
   public Agenda showResults(Long agendaId) {
-    return agendaRepository.showResults(agendaId);
+     Agenda agenda = agendaRepository.showResults(agendaId);
+    if (!agenda.isVoted()) {
+      throw new IllegalStateException("Pauta ainda não votada.");
+    }
+    return agenda;
   }
 }

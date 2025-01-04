@@ -18,8 +18,9 @@ public class AssociatedService implements IAssociatedServicePort {
   public void registerAssociated(Associated associated) throws Exception {
     String cpf = associated.getCpf().replaceAll("[.\\-\\/]", "");
       if (associatedRepository.findByCpf(cpf) != null) {
-        throw new Exception("CPF já cadastrado.");
+        throw new IllegalStateException("CPF já cadastrado.");
       }
+      associated.setCpf(cpf);
       associatedRepository.registerAssociated(associated);
   }
 

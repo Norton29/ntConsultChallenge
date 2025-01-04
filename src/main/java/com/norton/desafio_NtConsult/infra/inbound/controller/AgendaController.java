@@ -1,6 +1,7 @@
 package com.norton.desafio_NtConsult.infra.inbound.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +31,14 @@ public class AgendaController {
   @GetMapping
   public ResponseEntity<List<AgendaDTO>> agendas() {
     List<Agenda> list = agendaService.find();
-    List<AgendaDTO> agendaDTOs = mappers.agendaToAgendaDTO(list);
-    return ResponseEntity.ok(agendaDTOs);
+   List<AgendaDTO> agendasDTOs = list.stream().map(agenda -> mappers.agendaToAgendaDTO(agenda))
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(agendasDTOs);
   }
 
   @SuppressWarnings("rawtypes")
   @PostMapping("/register")
-  public ResponseEntity registerAgenda(@RequestBody AgendaDTO agenda) {
+  public ResponseEntity registerAgenda(@RequestBody AgendaDTO agenda) throws Exception {
     agendaService.registerAgenda(agenda.getDescription());
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }

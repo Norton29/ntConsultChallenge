@@ -9,6 +9,7 @@ import com.norton.desafio_NtConsult.application.core.usecase.AssociatedService;
 import com.norton.desafio_NtConsult.application.core.usecase.PollService;
 import com.norton.desafio_NtConsult.application.ports.out.IAgendaRepositoryPort;
 import com.norton.desafio_NtConsult.application.ports.out.IAssociatedRepositoryPort;
+import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
 import com.norton.desafio_NtConsult.infra.config.exceptions.GlobalExceptionHandler;
 
@@ -27,8 +28,8 @@ public class Config {
 
     @Bean
     PollService pollService(IPollRepositoryPort pollRepository, AgendaService agendaService,
-            AssociatedService associatedService) {
-        return new PollService(pollRepository, agendaService, associatedService);
+            AssociatedService associatedService, ICPFValidatorPort cpfValidator) {
+        return new PollService(pollRepository, agendaService, associatedService, cpfValidator);
     }
 
     @Bean

@@ -13,8 +13,8 @@ public class AgendaDTO {
 
     private Long id;
     private String description;
-    private Integer yesVotes;
-    private Integer noVotes;
+    private Integer yes;
+    private Integer no;
     private boolean voted;
 
 }

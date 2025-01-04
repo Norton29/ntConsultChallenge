@@ -14,11 +14,14 @@ import com.norton.desafio_NtConsult.application.core.domain.CurrentPoll;
 import com.norton.desafio_NtConsult.application.core.domain.Poll;
 import com.norton.desafio_NtConsult.application.core.domain.Vote;
 import com.norton.desafio_NtConsult.application.ports.in.IPollServicePort;
+import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
 
 public class PollService implements IPollServicePort {
 
   private final IPollRepositoryPort pollRepository;
+
+  private final ICPFValidatorPort cpfValidator;
 
   AgendaService agendaService;
 
@@ -29,10 +32,11 @@ public class PollService implements IPollServicePort {
   private boolean openPoll = false;
   private Set<Long> associatedVoted = new HashSet<>();
 
-  public PollService(IPollRepositoryPort pollRepository, AgendaService agendaService, AssociatedService associatedService) {
+  public PollService(IPollRepositoryPort pollRepository, AgendaService agendaService, AssociatedService associatedService, ICPFValidatorPort cpfValidator) {
     this.pollRepository = pollRepository;
     this.agendaService = agendaService;
     this.associatedService = associatedService;
+    this.cpfValidator = cpfValidator;
   }
 
   @Override
@@ -68,6 +72,9 @@ public class PollService implements IPollServicePort {
     if (associatedVoted.contains(associated.getId())) {
       throw new IllegalStateException("Associado já votou.");
     }
+    // if(!cpfValidator.isValid(vote.getAssociated().getCpf())) {
+    //   throw new IllegalStateException("CPF inválido.");
+    // }
     associatedVoted.add(associated.getId());
     registerVote(vote.isVote());
   }
@@ -95,8 +102,8 @@ public class PollService implements IPollServicePort {
 
     Agenda agenda = agendaService.findById(currentPoll.getAgenda().getId());
     if (agenda != null) {
-      agenda.setNoVotes(getNoVote());
-      agenda.setYesVotes(getYesVote());
+      agenda.setNo(getNoVote());
+      agenda.setYes(getYesVote());
       agenda.setVoted(true);
       agendaService.save(agenda);
     }

@@ -12,7 +12,7 @@ public interface IAgendaServicePort {
     
     public Agenda findById(Long id);
 
-    public void registerAgenda(String description);
+    public void registerAgenda(String description) throws Exception;
 
     public Agenda showResults(Long agendaId);
 
