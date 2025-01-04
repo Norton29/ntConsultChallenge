@@ -1,10 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5433/poll
-    username: postgres
-    password: postgres
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  profiles:
+    active:
+    - prod
