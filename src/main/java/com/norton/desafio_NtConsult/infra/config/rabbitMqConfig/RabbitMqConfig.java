@@ -94,5 +94,4 @@ public class RabbitMqConfig {
         .to(deadLetterExchange())
         .with(routingKeyDlxQueue);
   }
-
 }
