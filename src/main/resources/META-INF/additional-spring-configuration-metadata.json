@@ -1,0 +1,37 @@
+{"properties": [
+  {
+    "name": "rabbitmq.routing-key.result",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.rabbitmq.routing-key.result'"
+  },
+  {
+    "name": "rabbitmq.routing-key.result-dlx",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.routing-key.result-dlx'"
+  },
+  {
+    "name": "rabbitmq.exchange.voting-result",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.exchange.voting-result'"
+  },
+  {
+    "name": "rabbitmq.exchange.DLX",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.exchange.DLX'"
+  },
+  {
+    "name": "rabbitmq.queue.voting-result",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.queue.voting-result'"
+  },
+  {
+    "name": "rabbitmq.queue.DLX",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.queue.DLX'"
+  },
+  {
+    "name": "rabbitmq.routing-key.result-dlx-queue",
+    "type": "java.lang.String",
+    "description": "A description for 'rabbitmq.routing-key.result-dlx-queue'"
+  }
+]}

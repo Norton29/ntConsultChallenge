@@ -20,7 +20,7 @@ import com.norton.desafio_NtConsult.infra.inbound.mappers.Mappers;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/agenda")
+@RequestMapping("/v1/agenda")
 @AllArgsConstructor
 public class AgendaController {
 

@@ -8,4 +8,24 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+
+rabbitmq:
+  exchange:
+    voting-result: voting-result-exchange
+    DLX: result-dlx
+  queue:
+    voting-result: voting-result-queue
+    DLX: result-dlx-queue
+  routing-key:
+    result: voting-result
+    result-dlx: result-dlx
+    result-dlx-queue: result-dlx-queue
+

@@ -11,6 +11,7 @@ import com.norton.desafio_NtConsult.application.ports.out.IAgendaRepositoryPort;
 import com.norton.desafio_NtConsult.application.ports.out.IAssociatedRepositoryPort;
 import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
+import com.norton.desafio_NtConsult.application.ports.out.IResultQueuePort;
 import com.norton.desafio_NtConsult.infra.config.exceptions.GlobalExceptionHandler;
 
 @Configuration
@@ -28,8 +29,8 @@ public class Config {
 
     @Bean
     PollService pollService(IPollRepositoryPort pollRepository, AgendaService agendaService,
-            AssociatedService associatedService, ICPFValidatorPort cpfValidator) {
-        return new PollService(pollRepository, agendaService, associatedService, cpfValidator);
+            AssociatedService associatedService, ICPFValidatorPort cpfValidator,IResultQueuePort resultQueue) {
+        return new PollService(pollRepository, agendaService, associatedService, cpfValidator, resultQueue);
     }
 
     @Bean
