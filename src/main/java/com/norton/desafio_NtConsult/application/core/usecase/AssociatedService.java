@@ -17,16 +17,11 @@ public class AssociatedService implements IAssociatedServicePort {
   @Override
   public void registerAssociated(Associated associated) throws Exception {
     String cpf = associated.getCpf().replaceAll("[.\\-\\/]", "");
-      if (associatedRepository.findByCpf(cpf) != null) {
+    associated.setCpf(cpf);
+      if (associatedRepository.find().stream().anyMatch(a -> a.getCpf().equals(associated.getCpf()))) {
         throw new IllegalStateException("CPF já cadastrado.");
       }
-      associated.setCpf(cpf);
       associatedRepository.registerAssociated(associated);
-  }
-
-  @Override
-  public Associated findById(Long id)  {
-    return associatedRepository.findById(id);
   }
 
   @Override

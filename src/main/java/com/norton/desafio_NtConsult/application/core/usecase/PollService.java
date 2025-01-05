@@ -3,8 +3,8 @@ package com.norton.desafio_NtConsult.application.core.usecase;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.scheduling.annotation.Async;
 
@@ -19,7 +19,10 @@ import com.norton.desafio_NtConsult.application.ports.in.IPollServicePort;
 import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
 import com.norton.desafio_NtConsult.application.ports.out.IResultQueuePort;
+import com.norton.desafio_NtConsult.infra.config.exceptions.GenericException;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class PollService implements IPollServicePort {
 
   private final IPollRepositoryPort pollRepository;
@@ -31,12 +34,7 @@ public class PollService implements IPollServicePort {
   AgendaService agendaService;
 
   AssociatedService associatedService;
-
-  private AtomicInteger voteYes = new AtomicInteger(0);
-  private AtomicInteger voteNo = new AtomicInteger(0);
-  private boolean openPoll = false;
-  private Set<Long> associatedVoted = new HashSet<>();
-
+  
   public PollService(IPollRepositoryPort pollRepository, AgendaService agendaService, AssociatedService associatedService, 
   ICPFValidatorPort cpfValidator, IResultQueuePort resultQueue) {
     this.pollRepository = pollRepository;
@@ -46,14 +44,28 @@ public class PollService implements IPollServicePort {
     this.resultQueue = resultQueue;
   }
 
+
+  private final ConcurrentHashMap<Long, CurrentPoll> activePolls = new ConcurrentHashMap<>(); 
+
   @Override
-  public void startPoll(CurrentPoll currentPoll) throws JsonProcessingException {
+  public void startPoll(CurrentPoll currentPoll) {
     Agenda agenda = agendaService.findById(currentPoll.getAgenda().getId());
     if (agenda.isVoted()) {
-      throw new IllegalStateException("Pauta já votada.");
+      throw new GenericException("Pauta já votada.");
     }
-    openPoll();
-    closePollAuto(currentPoll);
+    openPoll(currentPoll);
+    activePolls.put(agenda.getId(), currentPoll);
+    CompletableFuture.runAsync(() -> {
+      try {
+        closePollAuto(currentPoll);
+
+      }catch (JsonProcessingException e){
+        throw new GenericException("Erro ao enviar o resultado.", e);
+      } catch (Exception e) {
+        throw new GenericException("Erro ao encerrar sessão de votação.", e);
+      }
+      });
+      
   }
 
   @Async
@@ -67,79 +79,81 @@ public class PollService implements IPollServicePort {
       closePoll(currentPoll);
       System.out.println("Sessão encerrada automaticamente.");
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      throw new GenericException("Erro ao encerrar sessão de votação.", e);
     }
   }
 
   public void registerVote(Vote vote) {
-    if (!isPollOpen()) {
-      throw new IllegalStateException("Sessão de votação encerrada.");
+    CurrentPoll currentPoll = activePolls.get(vote.getAgenda().getId());
+    if (currentPoll == null || !currentPoll.isOpenPoll()) {
+      throw new GenericException("Sessão de votação não encontrada ou já encerrada.");
     }
     Associated associated = associatedService.findByCpf(vote.getAssociated().getCpf());
-    if (associatedVoted.contains(associated.getId())) {
-      throw new IllegalStateException("Associado já votou.");
+    if (currentPoll.getAssociatedVoted().contains(associated.getId())) {
+      throw new GenericException("Associado já votou.");
     }
     // if(!cpfValidator.isValid(vote.getAssociated().getCpf())) {
-    //   throw new IllegalStateException("CPF inválido.");
+    //   throw new GenericException("CPF inválido.");
     // }
-    associatedVoted.add(associated.getId());
-    registerVote(vote.isVote());
+    currentPoll.getAssociatedVoted().add(associated.getId());
+    registerVote(currentPoll, vote.isVote());
   }
 
   public Poll showResults(Long pollId) {
     return pollRepository.showResults(pollId);
   }
 
-  public void openPoll() {
-    this.openPoll = true;
-    associatedVoted.clear();
-    this.voteYes.set(0);
-    this.voteNo.set(0);
+  public void openPoll(CurrentPoll currentPoll) {
+    currentPoll.setOpenPoll(true);
+    currentPoll.setYes(0);
+    currentPoll.setNo(0);
+    currentPoll.setAssociatedVoted(new HashSet<>());
   }
 
   public void closePoll(CurrentPoll currentPoll) throws JsonProcessingException  {
-    this.openPoll = false;
+    synchronized(currentPoll){
+      System.out.println("Encerrando sessão de votação para: " + currentPoll.getAgenda().getId());
+      currentPoll.setOpenPoll(false);
+    
+      Agenda agenda = agendaService.findById(currentPoll.getAgenda().getId());
+      if (agenda != null) {
+        agenda.setNo(currentPoll.getNo());
+        agenda.setYes(currentPoll.getYes());
+        agenda.setVoted(true);
+        agendaService.save(agenda);
+      }
+      
+      resultQueue.sendResult(Result.builder()
+      .agenda(agenda)
+      .minutes(currentPoll.getMinutes())
+      .build());
+      
+      activePolls.remove(currentPoll.getAgenda().getId());
+    }
 
-    pollRepository.save(Poll.builder()
+  }
+
+  public void registerVote(CurrentPoll currentPoll, boolean voto) {
+    synchronized (currentPoll) {
+      if (voto) {
+        currentPoll.setYes(currentPoll.getYes() + 1);
+      } else {
+        currentPoll.setNo(currentPoll.getNo() + 1);
+      }
+      Poll poll = pollRepository.findByAgendaId(currentPoll);
+      if(poll == null ){
+        pollRepository.save(Poll.builder()
         .agenda(currentPoll.getAgenda())
-        .yesVotes(getYesVote())
-        .noVotes(getNoVote())
+        .yesVotes(currentPoll.getYes())
+        .noVotes(currentPoll.getNo())
         .minutes(currentPoll.getMinutes())
         .build());
-
-    Agenda agenda = agendaService.findById(currentPoll.getAgenda().getId());
-    if (agenda != null) {
-      agenda.setNo(getNoVote());
-      agenda.setYes(getYesVote());
-      agenda.setVoted(true);
-      agendaService.save(agenda);
+      }else{
+        poll.setYesVotes(currentPoll.getYes());
+        poll.setNoVotes(currentPoll.getNo());
+        pollRepository.save(poll);
+      }
     }
-
-    resultQueue.sendResult(Result.builder()
-        .agenda(agenda)
-        .minutes(currentPoll.getMinutes())
-        .build());
-
-  }
-
-  public void registerVote(boolean voto) {
-    if (voto == true) {
-      voteYes.incrementAndGet();
-    } else if (voto == false) {
-      voteNo.incrementAndGet();
-    }
-  }
-
-  public int getYesVote() {
-    return voteYes.get();
-  }
-
-  public int getNoVote() {
-    return voteNo.get();
-  }
-
-  public boolean isPollOpen() {
-    return openPoll;
   }
 
   public List<Poll> find() {

@@ -30,15 +30,6 @@ public class AssociatedrepositoryAdapter implements IAssociatedRepositoryPort {
   }
 
   @Override
-  public Associated findById(Long id) {
-    AssociatedModel associatedModel = associatedRepository.findById(id).orElse(null);
-    if (associatedModel == null) {
-      throw new NoSuchElementException("Associado não encontrado.");
-    }
-    return mappers.associatedModelToAssociated(associatedModel);
-  }
-
-  @Override
   public Associated findByCpf(String cpf) {
     AssociatedModel associatedModel = associatedRepository.findByCpf(cpf).orElse(null);
     if (associatedModel == null) {
