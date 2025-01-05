@@ -15,6 +15,7 @@ spring:
     username: dxnatuly
     password: QLC3ih2z7r3d02ohgf0V47H1k3w03u60
 
+
 rabbitmq:
   exchange:
     voting-result: voting-result-exchange
