@@ -10,6 +10,7 @@ import lombok.Setter;
 public class VoteDTO {
 
     private boolean vote;
+    private AgendaDTO agenda;
     private AssociatedDTO associated;
     
 }

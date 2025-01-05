@@ -45,13 +45,6 @@ public class AssociatedController {
         return ResponseEntity.ok(associatedDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AssociatedDTO> getById(@PathVariable Long id) throws Exception {
-        Associated associated = associatedService.findById(id);
-        AssociatedDTO associatedDto = mappers.associatedToAssociatedDTO(associated);
-        return ResponseEntity.ok(associatedDto);
-    }
-
     @GetMapping
     public ResponseEntity<List<AssociatedDTO>> getAll() {
         List<Associated> list = associatedService.find();

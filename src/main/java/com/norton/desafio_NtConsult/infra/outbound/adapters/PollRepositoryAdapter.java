@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.norton.desafio_NtConsult.application.core.domain.CurrentPoll;
 import com.norton.desafio_NtConsult.application.core.domain.Poll;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
 import com.norton.desafio_NtConsult.infra.inbound.mappers.Mappers;
@@ -45,6 +46,16 @@ public class PollRepositoryAdapter implements IPollRepositoryPort {
   public Poll save(Poll poll) {
     PollModel pollModel = mappers.pollToPollModel(poll);
     return mappers.pollModelToPoll(pollRepository.save(pollModel));
+  }
+
+  @Override
+  public Poll findByAgendaId(CurrentPoll currentPoll) {
+    PollModel pollModel = pollRepository.findByAgendaId(currentPoll.getAgenda().getId()).orElse(null);
+    if(pollModel == null) {
+      return null;
+    }
+    return mappers.pollModelToPoll(pollModel);
+
   }
 
 }

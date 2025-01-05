@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Vote {
 
   private boolean vote;
+  private Agenda agenda;
   private Associated associated;
 
 }

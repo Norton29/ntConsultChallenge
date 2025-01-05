@@ -8,8 +8,6 @@ public interface IAssociatedRepositoryPort {
 
   public void registerAssociated(Associated associated) throws Exception;
 
-  public Associated findById(Long id);
-
   public Associated findByCpf(String cpf);
 
   public void deleteAssociated(Long id);
