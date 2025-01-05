@@ -42,6 +42,9 @@ public class RabbitMqConfig {
   @Value(value = "${rabbitmq.queue.DLX}")
   private String deadLetterQueue;
 
+  @Value(value = "${rabbitmq.queue.expired-time}")
+  private int expiredTime;
+
 
 
   @Bean
@@ -59,6 +62,7 @@ public class RabbitMqConfig {
     Map<String, Object> argsResult = new HashMap<>();
     argsResult.put("x-dead-letter-exchange", DLX);
     argsResult.put("x-dead-letter-routing-key", routingKeyDlx);
+    argsResult.put("x-message-ttl", expiredTime);
     return QueueBuilder.durable(votingResultQueue).withArguments(argsResult).build();
   }
 

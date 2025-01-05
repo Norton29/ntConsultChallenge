@@ -25,6 +25,7 @@ rabbitmq:
   queue:
     voting-result: voting-result-queue
     DLX: result-dlx-queue
+    expired-time: 600000
   routing-key:
     result: voting-result
     result-dlx: result-dlx
