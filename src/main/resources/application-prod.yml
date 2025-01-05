@@ -14,6 +14,7 @@ spring:
     port: 5672
     username: dxnatuly
     password: QLC3ih2z7r3d02ohgf0V47H1k3w03u60
+    virtual-host: dxnatuly
      
 
 
