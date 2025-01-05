@@ -10,9 +10,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
   rabbitmq:
-    host: shark-01.rmq.cloudamqp.com
-    username: dxnatuly
+    host: shark.rmq.cloudamqp.com
+    port: 1883
+    username: dxnatuly:dxnatuly
     password: QLC3ih2z7r3d02ohgf0V47H1k3w03u60
+     
 
 
 rabbitmq:
