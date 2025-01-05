@@ -8,20 +8,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.scheduling.annotation.Async;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.norton.desafio_NtConsult.application.core.domain.Agenda;
 import com.norton.desafio_NtConsult.application.core.domain.Associated;
 import com.norton.desafio_NtConsult.application.core.domain.CurrentPoll;
 import com.norton.desafio_NtConsult.application.core.domain.Poll;
+import com.norton.desafio_NtConsult.application.core.domain.Result;
 import com.norton.desafio_NtConsult.application.core.domain.Vote;
 import com.norton.desafio_NtConsult.application.ports.in.IPollServicePort;
 import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
+import com.norton.desafio_NtConsult.application.ports.out.IResultQueuePort;
 
 public class PollService implements IPollServicePort {
 
   private final IPollRepositoryPort pollRepository;
 
   private final ICPFValidatorPort cpfValidator;
+
+  private final IResultQueuePort resultQueue;
 
   AgendaService agendaService;
 
@@ -32,15 +37,17 @@ public class PollService implements IPollServicePort {
   private boolean openPoll = false;
   private Set<Long> associatedVoted = new HashSet<>();
 
-  public PollService(IPollRepositoryPort pollRepository, AgendaService agendaService, AssociatedService associatedService, ICPFValidatorPort cpfValidator) {
+  public PollService(IPollRepositoryPort pollRepository, AgendaService agendaService, AssociatedService associatedService, 
+  ICPFValidatorPort cpfValidator, IResultQueuePort resultQueue) {
     this.pollRepository = pollRepository;
     this.agendaService = agendaService;
     this.associatedService = associatedService;
     this.cpfValidator = cpfValidator;
+    this.resultQueue = resultQueue;
   }
 
   @Override
-  public void startPoll(CurrentPoll currentPoll) {
+  public void startPoll(CurrentPoll currentPoll) throws JsonProcessingException {
     Agenda agenda = agendaService.findById(currentPoll.getAgenda().getId());
     if (agenda.isVoted()) {
       throw new IllegalStateException("Pauta já votada.");
@@ -50,7 +57,7 @@ public class PollService implements IPollServicePort {
   }
 
   @Async
-  public void closePollAuto(CurrentPoll currentPoll) {
+  public void closePollAuto(CurrentPoll currentPoll) throws JsonProcessingException {
     if (currentPoll.getMinutes() == null) {
       currentPoll.setMinutes(0);
     }
@@ -90,7 +97,7 @@ public class PollService implements IPollServicePort {
     this.voteNo.set(0);
   }
 
-  public void closePoll(CurrentPoll currentPoll)  {
+  public void closePoll(CurrentPoll currentPoll) throws JsonProcessingException  {
     this.openPoll = false;
 
     pollRepository.save(Poll.builder()
@@ -107,6 +114,12 @@ public class PollService implements IPollServicePort {
       agenda.setVoted(true);
       agendaService.save(agenda);
     }
+
+    resultQueue.sendResult(Result.builder()
+        .agenda(agenda)
+        .minutes(currentPoll.getMinutes())
+        .build());
+
   }
 
   public void registerVote(boolean voto) {

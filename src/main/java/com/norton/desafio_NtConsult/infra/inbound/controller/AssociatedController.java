@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 
 
 @RestController
-@RequestMapping("/associated")
+@RequestMapping("/v1/associated")
 @AllArgsConstructor
 public class AssociatedController {
 

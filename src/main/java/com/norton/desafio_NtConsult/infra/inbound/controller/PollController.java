@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.norton.desafio_NtConsult.application.core.domain.CurrentPoll;
 import com.norton.desafio_NtConsult.application.core.domain.Poll;
 import com.norton.desafio_NtConsult.application.core.domain.Vote;
@@ -22,7 +23,7 @@ import com.norton.desafio_NtConsult.infra.inbound.mappers.Mappers;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/poll")
+@RequestMapping("/v1/poll")
 @AllArgsConstructor
 public class PollController {
 
@@ -32,7 +33,7 @@ public class PollController {
 
 
   @PostMapping("/start")
-  public ResponseEntity<String> startPoll(@RequestBody CurrentPollDTO currentPollDTO) {
+  public ResponseEntity<String> startPoll(@RequestBody CurrentPollDTO currentPollDTO) throws JsonProcessingException {
     CurrentPoll currentPoll = mappers.currentPollDTOToCurrentPoll(currentPollDTO);
     pollService.startPoll(currentPoll);
     return ResponseEntity.ok().build();
