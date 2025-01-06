@@ -10,8 +10,10 @@ NtConsult Challenge is an API designed to create a space for agenda voting. The 
 - **Messaging Service**: RabbitMQ
 
 ## How to Install and Run
-The API is provisioned in the cloud and ready for use. Its documentation is available through Swagger at the following link:
+The API is provisioned in the cloud and ready for use at the followinf link: 
+[NtConsult Challenge API](https://nt-consult-desafio-8143d06b9be2.herokuapp.com)
 
+Its documentation is available through Swagger at the following link:
 [Swagger Documentation](https://nt-consult-desafio-8143d06b9be2.herokuapp.com/swagger-ui.html)
 
 ## Example of Use
