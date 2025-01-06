@@ -21,3 +21,8 @@ The API is provisioned in the cloud and ready for use. Its documentation is avai
 4. **Messaging**: At the end of the voting period, the results are sent to a messaging queue (RabbitMQ) for further processing by other parts of the application.
 
 ---
+# Notes
+
+- The implementation for accessing the external API proposed in the challenge has been included in the code. However, the external API is currently non-functional, and the related code section has been commented out.
+
+---
