@@ -5,6 +5,7 @@ import java.util.List;
 import com.norton.desafio_NtConsult.application.core.domain.Associated;
 import com.norton.desafio_NtConsult.application.ports.in.IAssociatedServicePort;
 import com.norton.desafio_NtConsult.application.ports.out.IAssociatedRepositoryPort;
+import com.norton.desafio_NtConsult.infra.config.exceptions.ForbiddenException;
 
 public class AssociatedService implements IAssociatedServicePort {
 
@@ -19,7 +20,7 @@ public class AssociatedService implements IAssociatedServicePort {
     String cpf = associated.getCpf().replaceAll("[.\\-\\/]", "");
     associated.setCpf(cpf);
       if (associatedRepository.find().stream().anyMatch(a -> a.getCpf().equals(associated.getCpf()))) {
-        throw new IllegalStateException("CPF já cadastrado.");
+        throw new ForbiddenException("CPF já cadastrado.");
       }
       associatedRepository.registerAssociated(associated);
   }

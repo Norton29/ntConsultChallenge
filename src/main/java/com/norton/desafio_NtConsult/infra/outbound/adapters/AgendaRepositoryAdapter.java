@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.norton.desafio_NtConsult.application.core.domain.Agenda;
 import com.norton.desafio_NtConsult.application.ports.out.IAgendaRepositoryPort;
+import com.norton.desafio_NtConsult.infra.config.exceptions.ForbiddenException;
 import com.norton.desafio_NtConsult.infra.inbound.mappers.Mappers;
 import com.norton.desafio_NtConsult.infra.inbound.model.AgendaModel;
 import com.norton.desafio_NtConsult.infra.outbound.repository.AgendaRepository;
@@ -46,14 +47,14 @@ public class AgendaRepositoryAdapter implements IAgendaRepositoryPort {
   }
 
   @Override
-  public void registerAgenda(String description) throws Exception {
+  public void registerAgenda(String description) {
     try {
       agendaRepository.save(AgendaModel.builder()
         .description(description)
         .voted(false)
         .build());
     } catch (Exception e) {
-      throw new Exception("Erro ao registrar pauta.");
+      throw new ForbiddenException("Erro ao registrar pauta.", e);
     }
     
   }

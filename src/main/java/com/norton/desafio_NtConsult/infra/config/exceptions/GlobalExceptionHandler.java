@@ -17,14 +17,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
   @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<?> handleUserNotFound(NoSuchElementException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  public ResponseEntity<Map<String, String>> handleUserNotFound(NoSuchElementException ex) {
+    Map<String, String> errorResponse = new HashMap<>();
+    errorResponse.put("message", ex.getMessage());
+    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
     Map<String, String> errorResponse = new HashMap<>();
-    errorResponse.put("error", "Internal Server Error");
     errorResponse.put("message", ex.getMessage());
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
@@ -33,12 +34,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<Map<String, String>> handleGenericException(GenericException ex) {
     Map<String, String> errorResponse = new HashMap<>();
     errorResponse.put("message", ex.getMessage());
-    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler(IllegalStateException.class)
-  public ResponseEntity<?> handleIllegalState(IllegalStateException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException ex) {
+    Map<String, String> errorResponse = new HashMap<>();
+    errorResponse.put("message", ex.getMessage());
+    return  new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(ForbiddenException.class)
+  public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenException ex) {
+    Map<String, String> errorResponse = new HashMap<>();
+    errorResponse.put("message", ex.getMessage());
+    return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
   }
 
 }

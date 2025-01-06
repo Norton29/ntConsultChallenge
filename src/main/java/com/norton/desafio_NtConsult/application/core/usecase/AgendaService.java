@@ -30,7 +30,7 @@ public class AgendaService implements IAgendaServicePort {
   }
 
   @Override
-  public void registerAgenda(String description) throws Exception {
+  public void registerAgenda(String description) {
     agendaRepository.registerAgenda(description);
   }
 

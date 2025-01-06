@@ -3,6 +3,7 @@ package com.norton.desafio_NtConsult.application.core.usecase;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +20,7 @@ import com.norton.desafio_NtConsult.application.ports.in.IPollServicePort;
 import com.norton.desafio_NtConsult.application.ports.out.ICPFValidatorPort;
 import com.norton.desafio_NtConsult.application.ports.out.IPollRepositoryPort;
 import com.norton.desafio_NtConsult.application.ports.out.IResultQueuePort;
+import com.norton.desafio_NtConsult.infra.config.exceptions.ForbiddenException;
 import com.norton.desafio_NtConsult.infra.config.exceptions.GenericException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -86,21 +88,17 @@ public class PollService implements IPollServicePort {
   public void registerVote(Vote vote) {
     CurrentPoll currentPoll = activePolls.get(vote.getAgenda().getId());
     if (currentPoll == null || !currentPoll.isOpenPoll()) {
-      throw new GenericException("Sessão de votação não encontrada ou já encerrada.");
+      throw new NoSuchElementException("Sessão de votação não encontrada ou já encerrada.");
     }
     Associated associated = associatedService.findByCpf(vote.getAssociated().getCpf());
     if (currentPoll.getAssociatedVoted().contains(associated.getId())) {
-      throw new GenericException("Associado já votou.");
+      throw new ForbiddenException("Associado já votou.");
     }
     // if(!cpfValidator.isValid(vote.getAssociated().getCpf())) {
     //   throw new GenericException("CPF inválido.");
     // }
     currentPoll.getAssociatedVoted().add(associated.getId());
     registerVote(currentPoll, vote.isVote());
-  }
-
-  public Poll showResults(Long pollId) {
-    return pollRepository.showResults(pollId);
   }
 
   public void openPoll(CurrentPoll currentPoll) {
@@ -158,6 +156,10 @@ public class PollService implements IPollServicePort {
 
   public List<Poll> find() {
     return pollRepository.find();    
+  }
+  
+  public Poll showResults(Long pollId) {
+    return pollRepository.showResults(pollId);
   }
 
 }

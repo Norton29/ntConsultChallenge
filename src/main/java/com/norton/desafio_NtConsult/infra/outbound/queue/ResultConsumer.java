@@ -5,7 +5,7 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import com.norton.desafio_NtConsult.infra.config.exceptions.GenericException;
+import com.norton.desafio_NtConsult.infra.config.exceptions.ForbiddenException;
 
 @Component
 public class ResultConsumer implements MessageListener {
@@ -16,7 +16,7 @@ public class ResultConsumer implements MessageListener {
         try {
             System.out.println("Mensagem recebida: " + new String(message.getBody()));
         } catch (Exception e) {
-            throw new GenericException("Erro ao receber mensagem da fila.");
+            throw new ForbiddenException("Erro ao receber mensagem da fila.");
         }
 
     }
