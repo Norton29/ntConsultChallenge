@@ -1,5 +1,8 @@
+# Ntconsult Challenge
+## _The Last Markdown Editor, Ever_
 
-# NtConsult Challenge
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+
 
 ## Description
 NtConsult Challenge is an API designed to create a space for agenda voting. The application facilitates the creation, voting, and result management for different agendas.
@@ -22,5 +25,3 @@ The API is provisioned in the cloud and ready for use. Its documentation is avai
 4. **Messaging**: At the end of the voting period, the results are sent to a messaging queue (RabbitMQ) for further processing by other parts of the application.
 
 ---
-
-Feel free to reach out or contribute to the project if you'd like to enhance its capabilities!
